@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facebook Ads — Math Tutor Leads</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #F5F2EC;
+    --surface: #EDEAE2;
+    --card: #FFFFFF;
+    --ink: #1A1A18;
+    --ink2: #5A5A56;
+    --ink3: #9A9A94;
+    --accent: #D04E2A;
+    --accent2: #2A6DD0;
+    --accent3: #2A9D5C;
+    --amber: #E8A020;
+    --border: rgba(26,26,24,0.1);
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    color: #fff;
+    padding: 48px 48px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.12;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 200px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: var(--accent2);
+    opacity: 0.1;
+  }
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: #fff;
+    max-width: 600px;
+    margin-bottom: 10px;
+  }
+  .header h1 em { color: #F0A882; font-style: italic; }
+  .header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 300;
+  }
+
+  /* MAIN */
+  .main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* METRICS ROW */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+  @media (max-width: 700px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+  .metric {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    position: absolute; top: 18px; right: 18px;
+  }
+  .metric-label { font-size: 11px; font-weight: 500; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .metric-value { font-family: 'Instrument Serif', serif; font-size: 40px; line-height: 1; color: var(--ink); margin-bottom: 4px; }
+  .metric-sub { font-size: 12px; color: var(--ink3); }
+
+  /* GRID */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 860px) { .grid3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .grid3 { grid-template-columns: 1fr; } }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .card-title {
+    font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink3); margin-bottom: 20px;
+  }
+
+  /* FUNNEL */
+  .funnel-step { margin-bottom: 12px; }
+  .funnel-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .funnel-name { font-size: 13px; color: var(--ink2); }
+  .funnel-nums { font-size: 12px; color: var(--ink3); }
+  .funnel-nums strong { color: var(--ink); font-weight: 500; }
+  .funnel-track { background: var(--surface); border-radius: 4px; height: 8px; overflow: hidden; }
+  .funnel-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+  /* BAR CHART */
+  .bar-item { margin-bottom: 14px; }
+  .bar-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .bar-label { font-size: 13px; color: var(--ink2); }
+  .bar-pct { font-size: 12px; font-weight: 500; color: var(--ink); }
+  .bar-track { background: var(--surface); border-radius: 4px; height: 7px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+
+  /* CITY TABLE */
+  .city-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .city-row:last-child { border-bottom: none; }
+  .city-rank { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); min-width: 20px; }
+  .city-name { flex: 1; font-size: 13px; color: var(--ink); }
+  .city-bar-wrap { width: 80px; height: 5px; background: var(--surface); border-radius: 3px; }
+  .city-bar { height: 5px; border-radius: 3px; background: var(--accent2); }
+  .city-count { font-size: 12px; color: var(--ink3); min-width: 28px; text-align: right; }
+  .city-rate { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; min-width: 38px; text-align: right; }
+
+  /* INSIGHTS */
+  .insight {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .insight:last-child { border-bottom: none; }
+  .insight-num {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--accent); background: rgba(208,78,42,0.08);
+    border-radius: 6px; padding: 4px 8px; min-width: 28px;
+    text-align: center; margin-top: 1px; flex-shrink: 0;
+  }
+  .insight-text { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+  .insight-text strong { color: var(--ink); font-weight: 500; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ink3); margin: 32px 0 14px;
+  }
+
+  /* REJECT PILL */
+  .reject-list { display: flex; flex-direction: column; gap: 8px; }
+  .reject-row { display: flex; align-items: center; gap: 10px; }
+  .reject-reason { flex: 1; font-size: 13px; color: var(--ink2); }
+  .reject-count {
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    background: rgba(208,78,42,0.1); color: var(--accent);
+    padding: 2px 10px; border-radius: 20px; font-weight: 500;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center; padding: 24px;
+    font-size: 11px; color: var(--ink3);
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  /* CANVAS wrapper */
+  .chart-wrap { position: relative; width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-tag">Algonova · Recruitment Analytics</div>
+  <h1>Math Tutor Leads<br><em>Facebook Ads</em></h1>
+  <div class="header-sub">398 leads · Funnel & conversion analysis</div>
+</div>
+
+<div class="main">
+
+  <!-- METRICS -->
+  <div class="section-label">Overview</div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-dot" style="background:var(--accent2);"></div>
+      <div class="metric-label">Total leads</div>
+      <div class="metric-value">398</div>
+      <div class="metric-sub">from Facebook Ads</div>
+    </div>
+    <div class="metric">
+      <div class="metric-dot" style="background:var(--amber);"></div>
+      <div class="metric-label">Reached HR</div>
+      <div class="metric-value">69</div>
+      <div class="metric-sub">17.3% conversion</div>
+    </div>
+    <div class="metric">
+      <div class="metric-dot" style="background:var(--accent3);"></div>
+      <div class="metric-label">Hired</div>
+      <div class="metric-value">3</div>
+      <div class="metric-sub">0.75% of all leads</div>
+    </div>
+    <div class="metric">
+      <div class="metric-dot" style="background:var(--accent);"></div>
+      <div class="metric-label">Not processed</div>
+      <div class="metric-value">81</div>
+      <div class="metric-sub">ignored / contacted</div>
+    </div>
+  </div>
+
+  <!-- FUNNEL + SCHEDULE -->
+  <div class="section-label">Pipeline</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Hiring funnel</div>
+      <div id="funnel-container"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Conversion by schedule preference</div>
+      <div id="sched-container"></div>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE + CONFIDENCE -->
+  <div class="section-label">Candidate profile</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Conversion rate by teaching experience</div>
+      <div id="exp-container"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Conversion rate by math confidence</div>
+      <div id="conf-container"></div>
+      <div class="card-title" style="margin-top:28px;">Top rejection reasons at screening</div>
+      <div class="reject-list" id="reject-container"></div>
+    </div>
+  </div>
+
+  <!-- CITIES -->
+  <div class="section-label">Geography</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Leads by city (top 12)</div>
+      <div class="chart-wrap" style="height:280px;">
+        <canvas id="cityChart" role="img" aria-label="Bar chart of leads by city"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">City — leads vs conversion rate</div>
+      <div id="city-table"></div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-label">Key insights</div>
+  <div class="card">
+    <div class="card-title">What the data tells us</div>
+    <div class="insight">
+      <span class="insight-num">01</span>
+      <div class="insight-text"><strong>Weekend shifts is the biggest funnel killer.</strong> 118 leads (30% of the entire base) prefer weekends — yet only 2 of them (1.7%) made it past screening. The ad may be attracting people looking for casual side income, not professional tutors.</div>
+    </div>
+    <div class="insight">
+      <span class="insight-num">02</span>
+      <div class="insight-text"><strong>81 leads were never properly followed up</strong> — including 45 with 3+ years of teaching experience. These are potentially the strongest candidates in the pipeline, sitting untouched.</div>
+    </div>
+    <div class="insight">
+      <span class="insight-num">03</span>
+      <div class="insight-text"><strong>Experience level barely predicts conversion.</strong> Candidates with 1–2 years convert at 22.6% vs 21.7% for 3+ years. A 1-year teacher is just as likely to pass screening as a veteran — seniority alone isn't the filter.</div>
+    </div>
+    <div class="insight">
+      <span class="insight-num">04</span>
+      <div class="insight-text"><strong>Full-time candidates convert 26x better than weekend candidates</strong> (44% vs 1.7%). Shifting ad targeting toward people open to flexible or full-time work should dramatically improve lead quality.</div>
+    </div>
+    <div class="insight">
+      <span class="insight-num">05</span>
+      <div class="insight-text"><strong>32 leads were rejected for having no math teaching experience</strong> despite answering "Yes" on the form. The screening question isn't filtering effectively — a more specific question or a short test task at sign-up could save significant recruiter time.</div>
+    </div>
+    <div class="insight">
+      <span class="insight-num">06</span>
+      <div class="insight-text"><strong>Bekasi and Palembang punch above their weight</strong> — 40% and 43% conversion despite small volumes. These cities may have a stronger pool of qualified tutors relative to applicant count and could be worth targeted investment.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Algonova · Data as of April 2026 · Internal use only</div>
+
+<script>
+const ACCENT = '#D04E2A';
+const ACCENT2 = '#2A6DD0';
+const ACCENT3 = '#2A9D5C';
+const AMBER = '#E8A020';
+const SURFACE = '#EDEAE2';
+const INK = '#1A1A18';
+const INK2 = '#5A5A56';
+const INK3 = '#9A9A94';
+
+// FUNNEL
+const funnelSteps = [
+  { name: 'Leads received', count: 398, pct: 100, color: '#1A1A18' },
+  { name: 'Not processed (Ignore/Contacted)', count: 81, pct: 20.4, color: '#9A9A94' },
+  { name: 'Rejected at screening', count: 190, pct: 47.7, color: ACCENT },
+  { name: 'Reached HR interview', count: 46, pct: 11.6, color: ACCENT2 },
+  { name: 'Test task / TIL stage', count: 20, pct: 5.0, color: AMBER },
+  { name: 'Hired / Onboarding', count: 3, pct: 0.75, color: ACCENT3 },
+];
+const funnelEl = document.getElementById('funnel-container');
+funnelSteps.forEach(s => {
+  funnelEl.innerHTML += `
+    <div class="funnel-step">
+      <div class="funnel-top">
+        <span class="funnel-name">${s.name}</span>
+        <span class="funnel-nums"><strong>${s.count}</strong> &nbsp;${s.pct}%</span>
+      </div>
+      <div class="funnel-track">
+        <div class="funnel-fill" style="width:${Math.max(s.pct,0.5)}%;background:${s.color};"></div>
+      </div>
+    </div>`;
+});
+
+// SCHEDULE
+const schedData = [
+  { label: 'Full-time', total: 25, rate: 44.0, color: ACCENT3 },
+  { label: 'Flexible', total: 167, rate: 28.1, color: ACCENT2 },
+  { label: 'Morning', total: 21, rate: 14.3, color: AMBER },
+  { label: 'Afternoon', total: 67, rate: 9.0, color: '#B0A090' },
+  { label: 'Weekend shifts', total: 118, rate: 1.7, color: ACCENT },
+];
+const schedEl = document.getElementById('sched-container');
+schedData.forEach(s => {
+  schedEl.innerHTML += `
+    <div class="bar-item">
+      <div class="bar-top">
+        <span class="bar-label">${s.label} <span style="font-size:11px;color:var(--ink3);">(${s.total})</span></span>
+        <span class="bar-pct" style="color:${s.color}">${s.rate}%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${s.rate/44*100}%;background:${s.color};"></div>
+      </div>
+    </div>`;
+});
+
+// EXPERIENCE
+const expData = [
+  { label: '1–2 years', total: 106, rate: 22.6, color: ACCENT2 },
+  { label: '3+ years', total: 175, rate: 21.7, color: ACCENT2 },
+  { label: 'Less than 1 year', total: 100, rate: 7.0, color: AMBER },
+  { label: 'No experience', total: 17, rate: 0, color: ACCENT },
+];
+const expEl = document.getElementById('exp-container');
+expData.forEach(s => {
+  expEl.innerHTML += `
+    <div class="bar-item">
+      <div class="bar-top">
+        <span class="bar-label">${s.label} <span style="font-size:11px;color:var(--ink3);">(${s.total})</span></span>
+        <span class="bar-pct" style="color:${s.color}">${s.rate}%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${s.rate/22.6*100}%;background:${s.color};"></div>
+      </div>
+    </div>`;
+});
+
+// CONFIDENCE
+const confData = [
+  { label: 'High', total: 287, rate: 19.9, color: ACCENT3 },
+  { label: 'Basic', total: 109, rate: 10.1, color: AMBER },
+  { label: 'Not confident', total: 2, rate: 50.0, color: INK3 },
+];
+const confEl = document.getElementById('conf-container');
+confData.forEach(s => {
+  confEl.innerHTML += `
+    <div class="bar-item">
+      <div class="bar-top">
+        <span class="bar-label">${s.label} <span style="font-size:11px;color:var(--ink3);">(${s.total})</span></span>
+        <span class="bar-pct" style="color:${s.color}">${s.rate}%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${s.rate/50*100}%;background:${s.color};"></div>
+      </div>
+    </div>`;
+});
+
+// REJECT REASONS
+const rejectReasons = [
+  { reason: 'No math teaching experience', count: 32 },
+  { reason: 'Background not match / not align', count: 4 },
+  { reason: 'Candidate ghosting', count: 3 },
+  { reason: 'Already processed by other recruiter', count: 3 },
+  { reason: 'Wrong number / no-show', count: 2 },
+];
+const rejectEl = document.getElementById('reject-container');
+rejectReasons.forEach(r => {
+  rejectEl.innerHTML += `
+    <div class="reject-row">
+      <span class="reject-reason">${r.reason}</span>
+      <span class="reject-count">${r.count}</span>
+    </div>`;
+});
+
+// CITY CHART
+const cityData = [
+  { city: 'Surabaya', total: 49, rate: 20.4 },
+  { city: 'Jakarta', total: 29, rate: 27.6 },
+  { city: 'Bandung', total: 24, rate: 12.5 },
+  { city: 'Medan', total: 16, rate: 12.5 },
+  { city: 'Bekasi', total: 10, rate: 40.0 },
+  { city: 'Bogor', total: 10, rate: 10.0 },
+  { city: 'Semarang', total: 10, rate: 10.0 },
+  { city: 'Tangerang', total: 10, rate: 30.0 },
+  { city: 'Malang', total: 8, rate: 0.0 },
+  { city: 'Yogyakarta', total: 8, rate: 12.5 },
+  { city: 'Palembang', total: 7, rate: 42.9 },
+  { city: 'Bandar Lampung', total: 6, rate: 33.3 },
+];
+
+new Chart(document.getElementById('cityChart'), {
+  type: 'bar',
+  data: {
+    labels: cityData.map(c => c.city),
+    datasets: [{
+      label: 'Leads',
+      data: cityData.map(c => c.total),
+      backgroundColor: cityData.map(c => c.rate >= 30 ? ACCENT3 : c.rate >= 20 ? ACCENT2 : '#C8C4BC'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { afterLabel: (i) => `Conversion: ${cityData[i.dataIndex].rate}%` }
+    }},
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: INK2, maxRotation: 35 } },
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 }, color: INK3 } }
+    }
+  }
+});
+
+// CITY TABLE
+const cityTableEl = document.getElementById('city-table');
+const maxTotal = Math.max(...cityData.map(c=>c.total));
+cityData.forEach((c, i) => {
+  const rateColor = c.rate >= 30 ? ACCENT3 : c.rate >= 15 ? ACCENT2 : c.rate === 0 ? ACCENT : INK2;
+  cityTableEl.innerHTML += `
+    <div class="city-row">
+      <span class="city-rank">${String(i+1).padStart(2,'0')}</span>
+      <span class="city-name">${c.city}</span>
+      <div class="city-bar-wrap"><div class="city-bar" style="width:${c.total/maxTotal*100}%;"></div></div>
+      <span class="city-count">${c.total}</span>
+      <span class="city-rate" style="color:${rateColor}">${c.rate}%</span>
+    </div>`;
+});
+</script>
+</body>
+</html>
